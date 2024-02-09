@@ -30,6 +30,31 @@
                     console.error('Error:', error);
                 });
             }
+
+            function logout() {
+                // Perform an AJAX request to delete the item
+                fetch('/sign-out/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({}),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Item successfully deleted, you can redirect or update the UI as needed
+                        // window.location.reload();  // Reload the page for demonstration
+                        window.location.reload();
+                    } else {
+                        // Handle errors
+                        console.error('Failed to delete item');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
         
             function showEditForm(id, subject, predicate, object) {
                 document.getElementById('editTripleId').value = id;
@@ -100,9 +125,6 @@
             <input type="submit" value="add more triple">
         </form>
 
-        <form method="POST">
-            {% csrf_token %}
-            <input type="submit" value="logout">
-        </form>
+        <button onclick="logout()">logout</button>
     </body>
 </html>

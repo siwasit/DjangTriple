@@ -1,19 +1,55 @@
 import os
-from django.shortcuts import render
 from openpyxl import load_workbook
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth import login, logout  
+from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 
-from .forms import addTriple
+from .forms import addTriple , RegisterForm
 
-def login(request):
-    return
+def sign_in(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(
+            request, 
+            username=username, 
+            password=password
+        )
+
+        if user is not None:
+            # Log user in
+            login(request, user)
+            return redirect('homepage')
+            
+    return render(request, 'login.html')
+
+def sign_up(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('homepage')
+    else:
+        form = RegisterForm()
+        print(form)
+
+    return render(request, 'register.html', {'form': form})
+
+def sign_out(request):
+    # sign user out
+    logout(request)
+
+    # Redirect to sign-in page
+    return redirect('/sign-in')
 
 excel_file_path = os.path.join(os.path.dirname(__file__), 'sheet', 'triple_sheet.xlsx')
 workbook = load_workbook(excel_file_path)
 sheet = workbook.active
 
-def index(request):
+@login_required(login_url="/sign-in")
+def homepage(request):
 
     items = []
     row_count = 0
@@ -34,7 +70,7 @@ def index(request):
 
             workbook.save(excel_file_path)
 
-            return redirect('index')
+            return redirect('homepage')
     else:
         add_form = addTriple()
 
@@ -48,7 +84,7 @@ def index(request):
 def triple_delete(request, triple_id):
     sheet.delete_rows(idx=triple_id + 1)
     workbook.save(excel_file_path)
-    return redirect('index')
+    return redirect('homepage')
 
 def triple_edit(request, triple_id):
 
@@ -60,6 +96,6 @@ def triple_edit(request, triple_id):
         sheet["B" + str(triple_id + 1)] = triple_form_get['editPredicate']
         sheet["C" + str(triple_id + 1)] = triple_form_get['editObject']
         workbook.save(excel_file_path)
-        return redirect('index')
+        return redirect('homepage')
     else:
         return JsonResponse({'Error': '404 internal server error'})
