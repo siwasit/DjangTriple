@@ -45,10 +45,6 @@
             function cancelEdit() {
                 document.getElementById('editFormContainer').style.display = 'none';
             }
-
-            function handleClick() {
-                window.location.reload();
-            }
         </script>
     </head>
     <body>
@@ -102,6 +98,11 @@
             {{ add_form.object }}
             <input type="hidden" name="add_form_submit" value="1">
             <input type="submit" value="add more triple">
+        </form>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="submit" value="logout">
         </form>
     </body>
 </html>

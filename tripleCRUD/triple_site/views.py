@@ -4,11 +4,10 @@ from openpyxl import load_workbook
 from django.shortcuts import redirect
 from django.http import HttpResponse, JsonResponse
 
-from .forms import addTriple, editTriple
+from .forms import addTriple
 
-# Create your views here.
-# def index(request):
-#     return render(request, 'index.html', {'items' : items})
+def login(request):
+    return
 
 excel_file_path = os.path.join(os.path.dirname(__file__), 'sheet', 'triple_sheet.xlsx')
 workbook = load_workbook(excel_file_path)
