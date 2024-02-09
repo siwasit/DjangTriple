@@ -55,17 +55,12 @@ def triple_edit(request, triple_id):
 
     print(triple_id)   
     if request.method == "POST":
-        form = editTriple(request.POST)
-        print(form)
-        if form.is_valid():
-            triple_edit = form.cleaned_data 
-            print(triple_edit)
-            # sheet["A" + str(triple_id + 1)] = triple_edit['subject']
-            # sheet["B" + str(triple_id + 1)] = triple_edit['predicate']
-            # sheet["C" + str(triple_id + 1)] = triple_edit['object']
-            # workbook.save(excel_file_path)
-            return redirect('index')
+        triple_form_get = request.POST
+        print(triple_edit)
+        sheet["A" + str(triple_id + 1)] = triple_form_get['editSubject']
+        sheet["B" + str(triple_id + 1)] = triple_form_get['editPredicate']
+        sheet["C" + str(triple_id + 1)] = triple_form_get['editObject']
+        workbook.save(excel_file_path)
+        return redirect('index')
     else:
-        form = editTriple()
-
-    return redirect('index')
+        return JsonResponse({'Error': '404 internal server error'})
