@@ -50,9 +50,11 @@ sheet = workbook.active
 
 @login_required(login_url="/sign-in")
 def homepage(request):
+    for row in sheet.iter_rows(values_only=True):
+        print(row)
 
     items = []
-    row_count = 0
+    row_count = 1
     for i, row in enumerate(sheet.iter_rows(values_only=True), start=1):
         if i==1:
             continue
@@ -67,6 +69,7 @@ def homepage(request):
             sheet["A" + str(row_count + 1)] = triple_add['subject']
             sheet["B" + str(row_count + 1)] = triple_add['predicate']
             sheet["C" + str(row_count + 1)] = triple_add['object']
+            print(row_count)
 
             workbook.save(excel_file_path)
 
@@ -88,10 +91,8 @@ def triple_delete(request, triple_id):
 
 def triple_edit(request, triple_id):
 
-    print(triple_id)   
     if request.method == "POST":
         triple_form_get = request.POST
-        print(triple_edit)
         sheet["A" + str(triple_id + 1)] = triple_form_get['editSubject']
         sheet["B" + str(triple_id + 1)] = triple_form_get['editPredicate']
         sheet["C" + str(triple_id + 1)] = triple_form_get['editObject']
