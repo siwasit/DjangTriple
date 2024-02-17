@@ -109,7 +109,6 @@ def rdffile_export(request):
     ex_person = Namespace("http://example.org/person#")
     foaf = Namespace("http://xmlns.com/foaf/0.1/")
 
-    class_store = []
     for i, row in enumerate(sheet.iter_rows(values_only=True), start=1):
         if i==1:
             continue
@@ -127,7 +126,6 @@ def rdffile_export(request):
         if not triple_exists:
             # If the triple does not exist, add it to the graph
             graph.add(person_to_check)
-            class_store.append([name, class_type])
 
         if (ex_person[obj], RDF.type, None) in graph:
             graph.add((ex_person[name], foaf['knows'], ex_person[obj]))
