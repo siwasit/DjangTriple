@@ -1,130 +1,72 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TripleCheck</title>
 
-        <script>
-            function delete_triple(triple_id) {
-                // Perform an AJAX request to delete the item
-                fetch('/delete/' + triple_id, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({}),
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Item successfully deleted, you can redirect or update the UI as needed
-                        // window.location.reload();  // Reload the page for demonstration
-                        window.location.reload();
-                    } else {
-                        // Handle errors
-                        console.error('Failed to delete item');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripleCheck</title>
+    <script src="{% static 'mfunc.js' %}"></script> 
+</head>
 
-            function logout() {
-                // Perform an AJAX request to delete the item
-                fetch('/sign-out/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({}),
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Item successfully deleted, you can redirect or update the UI as needed
-                        // window.location.reload();  // Reload the page for demonstration
-                        window.location.reload();
-                    } else {
-                        // Handle errors
-                        console.error('Failed to delete item');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            }
-        
-            function showEditForm(id, subject, predicate, object) {
-                document.getElementById('editTripleId').value = id;
-                document.getElementById('editSubject').value = subject;
-                document.getElementById('editPredicate').value = predicate;
-                document.getElementById('editObject').value = object;
-                document.getElementById('editFormContainer').style.display = 'block';
-
-                var form = document.getElementById('editForm');
-                form.action = '/edit-triple/' + id;
-            }
-
-            function cancelEdit() {
-                document.getElementById('editFormContainer').style.display = 'none';
-            }
-        </script>
-    </head>
-    <body>
-        <h2>triple table dasboard</h2>
-        <table>
-            <tr>
-                <th>id</th>
-                <th></th>
-                <th></th>
-                <th>Subject</th>
-                <th>Predicate</th>
-                <th>Object</th>
-            </tr>
+<body>
+    <h2>triple table dasboard</h2>
+    <table>
+        <tr>
+            <th>id</th>
+            <th></th>
+            <th></th>
+            <th>Subject</th>
+            <th>Predicate</th>
+            <th>Object</th>
+            <th></th>
+        </tr>
         {% for item in items %}
-            <tr>
-                <td>{{ item.0 }}</td>
-                <td><button onclick="showEditForm('{{ item.0 }}', '{{ item.1 }}', '{{ item.2 }}', '{{ item.3 }}')">Edit</button></td>
-                <td><button onclick="delete_triple('{{ item.0 }}')">delete</button></td>
-                <td>{{ item.1 }}</td>
-                <td>{{ item.2 }}</td>
-                <td>{{ item.3 }}</td>
-            </tr>
+        <tr>
+            <td>{{ item.0 }}</td>
+            <td><button
+                    onclick="showEditForm('{{ item.0 }}', '{{ item.1 }}', '{{ item.2 }}', '{{ item.3 }}')">Edit</button>
+            </td>
+            <td><button onclick="delete_triple('{{ item.0 }}')">delete</button></td>
+            <td>{{ item.1 }}</td>
+            <td>{{ item.2 }}</td>
+            <td>{{ item.3 }}</td>
+            <td><button onclick="">approve</button></td>
+        </tr>
         {% endfor %}
-        </table><br>
+    </table><br>
 
-        <div id="editFormContainer" style="display: none;">
-            <hr>
-            <form id="editForm" method="POST" action="">
-                {% csrf_token %}
-                <input type="hidden" id="editTripleId" name="editTripleId">
-                <label for="editSubject">Subject:</label>
-                <input type="text" id="editSubject" name="editSubject">
-                <label for="editPredicate">Predicate:</label>
-                <input type="text" id="editPredicate" name="editPredicate">
-                <label for="editObject">Object:</label>
-                <input type="text" id="editObject" name="editObject">
-                <!-- <button type="submit" onclick="handleClick()">Update</button> -->
-                <input type="submit" value="update triple">
-                <button type="button" onclick="cancelEdit()">Cancel</button>
-            </form>
-            <hr>
-        </div>
-
-        <form method="POST">
+    <div id="editFormContainer" style="display: none;">
+        <hr>
+        <form id="editForm" method="POST" action="">
             {% csrf_token %}
-            <label for="{{ add_form.subject.id_for_label }}">Subject:</label>
-            {{ add_form.subject }}
-            <label for="{{ add_form.subject.id_for_label }}">Predicate:</label>
-            {{ add_form.predicate }}
-            <label for="{{ add_form.subject.id_for_label }}">Object:</label>
-            {{ add_form.object }}
-            <input type="hidden" name="add_form_submit" value="1">
-            <input type="submit" value="add more triple">
+            <input type="hidden" id="editTripleId" name="editTripleId">
+            <label for="editSubject">Subject:</label>
+            <input type="text" id="editSubject" name="editSubject">
+            <label for="editPredicate">Predicate:</label>
+            <input type="text" id="editPredicate" name="editPredicate">
+            <label for="editObject">Object:</label>
+            <input type="text" id="editObject" name="editObject">
+            <!-- <button type="submit" onclick="handleClick()">Update</button> -->
+            <input type="submit" value="update triple">
+            <button type="button" onclick="cancelEdit()">Cancel</button>
         </form>
+        <hr>
+    </div>
 
-        <button onclick="logout()">logout</button>
-    </body>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="{{ add_form.subject.id_for_label }}">Subject:</label>
+        {{ add_form.subject }}
+        <label for="{{ add_form.subject.id_for_label }}">Predicate:</label>
+        {{ add_form.predicate }}
+        <label for="{{ add_form.subject.id_for_label }}">Object:</label>
+        {{ add_form.object }}
+        <input type="hidden" name="add_form_submit" value="1">
+        <input type="submit" value="add more triple">
+    </form>
+
+    <button onclick="logout()">logout</button><button onclick="export_graph()">export</button>
+</body>
+
 </html>

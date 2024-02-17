@@ -9,4 +9,7 @@ urlpatterns = [
     path("", views.homepage, name="homepage"),
     path("delete/<int:triple_id>", views.triple_delete, name="index"),
     path('edit-triple/<int:triple_id>', views.triple_edit, name='edit_triple'),
+    #Path ของ Demo Sample 01
+    path("demo01_crud/", views.homepage, name="homepage"),
+    path("export/", views.rdffile_export, name="rdffile_export"),
 ]

@@ -1,0 +1,15 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix ns1: <http://example.org/person#> .
+
+ns1:himler a ns1:Person ;
+    foaf:knows ns1:peiper .
+
+ns1:peiper a ns1:Person ;
+    ns1:born "30 January 1915" ;
+    ns1:born_in "Wilmersdorf, Berlin, Germany" ;
+    ns1:die "14 July 1976" ;
+    ns1:is_a "German",
+        "nazi member",
+        "officer",
+        "soldier" .
+
