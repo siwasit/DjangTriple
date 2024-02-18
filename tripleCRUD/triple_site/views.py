@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 
 from rdflib import Graph, Literal, Namespace, RDF, XSD
+from .utils import parse_date
 
 from .forms import addTriple , RegisterForm
 
@@ -81,7 +82,6 @@ def homepage(request):
     else:
         add_form = addTriple()
 
-    print(items)
     context = {
         'items': items,
         'add_form': add_form,
@@ -131,9 +131,12 @@ def rdffile_export(request):
             graph.add(person_to_check)
 
         if (ex_person[obj], RDF.type, None) in graph:
-            graph.add((ex_person[name], foaf['knows'], ex_person[obj]))
+            graph.add((ex_person[name], foaf[predicate], ex_person[obj]))
         else:
-            graph.add((ex_person[name], ex_person[predicate], Literal(obj)))
+            if parse_date(obj) is not None:
+                graph.add((ex_person[name], ex_person[predicate], Literal(obj, datatype=XSD.date)))
+            else:
+                graph.add((ex_person[name], ex_person[predicate], Literal(obj)))
 
     graph_file_path = os.path.join(os.path.dirname(__file__), 'rdffile', 'rdf_graph_file.ttl')
     graph.serialize(destination=graph_file_path, format='turtle')

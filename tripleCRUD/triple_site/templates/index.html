@@ -12,8 +12,9 @@
         // Track approval status of each item
         var approvalStatus = {};
         var itemsAmount = '{{ items|length }}';
-        for (var i = 1; i < itemsAmount; i++) {
+        for (var i = 1; i <= itemsAmount; i++) {
             approvalStatus[i] = false; // Assuming item IDs start from 0
+            console.log(i)
         }
 
         function toggleApproval(itemId) {
