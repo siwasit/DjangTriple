@@ -4,13 +4,15 @@
 ns1:himler a ns1:Person ;
     ns1:born "7 October 1900" ;
     ns1:die "23 May 1945" ;
+    ns1:is_a "commander",
+        "officer" ;
     foaf:knows ns1:peiper .
 
 ns1:peiper a ns1:Person ;
+    ns1:born "30 January 1915" ;
     ns1:born_in "Wilmersdorf, Berlin, Germany" ;
     ns1:die "14 July 1976" ;
     ns1:is_a "German",
         "nazi member",
-        "officer",
         "soldier" .
 

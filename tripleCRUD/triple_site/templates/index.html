@@ -8,38 +8,82 @@
     <title>TripleCheck</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="{% static 'mfunc.js' %}"></script>
+    <script>
+        // Track approval status of each item
+        var approvalStatus = {};
+        var itemsAmount = '{{ items|length }}';
+        for (var i = 1; i < itemsAmount; i++) {
+            approvalStatus[i] = false; // Assuming item IDs start from 0
+        }
+
+        function toggleApproval(itemId) {
+            approvalStatus[itemId] = !approvalStatus[itemId];
+            updateButtonColor(itemId);
+            checkAllApproved();
+        }
+
+        function checkAllApproved() {
+            var allApproved = true;
+            for (var key in approvalStatus) {
+                if (!approvalStatus[key]) {
+                    allApproved = false;
+                    break;
+                }
+            }
+            document.getElementById('exportBtn').disabled = !allApproved;
+        }
+
+        function updateButtonColor(itemId) {
+            var button = document.getElementById('approvalBtn' + itemId);
+            if (approvalStatus[itemId]) {
+                button.classList.remove('btn-warning');
+                button.classList.add('btn-success');
+            } else {
+                button.classList.remove('btn-success');
+                button.classList.add('btn-warning');
+            }
+        }
+    </script>
 </head>
 
 <body>
     <div class="container">
         <h2>Triple Table Dashboard</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th></th>
-                    <th>Subject</th>
-                    <th>Predicate</th>
-                    <th>Object</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in items %}
-                <tr>
-                    <td>{{ item.0 }}</td>
-                    <td>
-                        <button class="btn btn-primary btn-margin" onclick="showEditForm('{{ item.0 }}', '{{ item.1 }}', '{{ item.2 }}', '{{ item.3 }}')">Edit</button>
-                        <button class="btn btn-danger btn-margin" onclick="delete_triple('{{ item.0 }}')">Delete</button>
-                    </td>
-                    <td>{{ item.1 }}</td>
-                    <td>{{ item.2 }}</td>
-                    <td>{{ item.3 }}</td>
-                    <td><button class="btn btn-success btn-margin" onclick="">Approve</button></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div style="height: 30rem; overflow-y: auto;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th></th>
+                        <th>Subject</th>
+                        <th>Predicate</th>
+                        <th>Object</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.0 }}</td>
+                        <td class="">
+                            <button class="btn btn-primary btn-margin"
+                                onclick="showEditForm('{{ item.0 }}', '{{ item.1 }}', '{{ item.2 }}', '{{ item.3 }}')">Edit</button>
+                            <button class="btn btn-danger btn-margin"
+                                onclick="delete_triple('{{ item.0 }}')">Delete</button>
+                        </td>
+                        <td>{{ item.1 }}</td>
+                        <td>{{ item.2 }}</td>
+                        <td>{{ item.3 }}</td>
+                        <td>
+                            <button id="approvalBtn{{ item.0 }}" class="btn btn-warning btn-margin" onclick="toggleApproval('{{ item.0 }}')">
+                                Approve
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <div id="editFormContainer" style="display: none;">
             <hr>
@@ -93,7 +137,7 @@
         </form>
 
         <button class="btn btn-primary" onclick="logout()">Logout</button>
-        <button class="btn btn-primary" onclick="export_graph()">Export</button>
+        <button id="exportBtn" class="btn btn-primary" onclick="export_graph()" disabled>Export</button>
     </div>
 </body>
 

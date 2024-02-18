@@ -60,7 +60,9 @@ def homepage(request):
     for i, row in enumerate(sheet.iter_rows(values_only=True), start=1):
         if i==1:
             continue
-        items.append((list(str(i-1)) + list(row)))
+        row_list = list(row)
+        row_list.insert(0, (str(i-1)))
+        items.append(row_list)
         row_count = i
 
     if request.method == "POST":
@@ -79,6 +81,7 @@ def homepage(request):
     else:
         add_form = addTriple()
 
+    print(items)
     context = {
         'items': items,
         'add_form': add_form,

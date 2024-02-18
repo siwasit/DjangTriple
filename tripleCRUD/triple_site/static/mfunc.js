@@ -121,3 +121,33 @@ function showEditForm(id, subject, predicate, object) {
 function cancelEdit() {
     document.getElementById('editFormContainer').style.display = 'none';
 }
+
+// function toggleApproval(itemId) {
+//     approvalStatus[itemId] = !approvalStatus[itemId];
+//     updateButtonColor(itemId);
+//     checkAllApproved();
+// }
+
+// function checkAllApproved() {
+//     var allApproved = true;
+//     for (var key in approvalStatus) {
+//         if (!approvalStatus[key]) {
+//             allApproved = false;
+//             break;
+//         }
+//     }
+//     document.getElementById('exportBtn').disabled = !allApproved;
+// }
+
+// function updateButtonColor(itemId) {
+//     var button = document.getElementById('approvalBtn' + itemId);
+//     if (approvalStatus[itemId]) {
+//         button.classList.remove('btn-warning');
+//         button.classList.add('btn-success');
+//     } else {
+//         button.classList.remove('btn-success');
+//         button.classList.add('btn-warning');
+//     }
+// }
+
+// var approvalStatus = {};
