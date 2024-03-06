@@ -5,7 +5,6 @@ from django.http import FileResponse, JsonResponse
 from django.contrib.auth import login, logout  
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
-import pandas as pd
 
 from rdflib import Graph, Literal, Namespace, RDF, XSD
 from .utils import parse_date
@@ -154,7 +153,7 @@ def import_xlsx(request):
     excel_folder_path = os.path.join(os.path.dirname(__file__), 'sheet')
     sheet_files = os.listdir(excel_folder_path)
     data = [[i+1, file] for i, file in enumerate(sheet_files)]
-    print(data)
+
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -177,7 +176,6 @@ def import_xlsx(request):
 
 def xlsx_del(request, file_number):
     # Delete the file
-    print(file_number)
     excel_folder_path = os.path.join(os.path.dirname(__file__), 'sheet')
     sheet_files = os.listdir(excel_folder_path)
     file_path = os.path.join(excel_folder_path, sheet_files[file_number-1])
