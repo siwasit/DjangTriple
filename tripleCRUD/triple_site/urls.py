@@ -12,4 +12,6 @@ urlpatterns = [
     #Path ของ Demo Sample 01
     path("demo01_crud/", views.homepage, name="homepage"),
     path("export/", views.rdffile_export, name="rdffile_export"),
+    path("import/", views.import_xlsx, name="import_xlsx"),
+    path("delete_xlsx/<int:file_number>", views.xlsx_del, name="xlsx_del"),
 ]

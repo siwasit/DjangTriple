@@ -5,11 +5,12 @@ from django.http import FileResponse, JsonResponse
 from django.contrib.auth import login, logout  
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+import pandas as pd
 
 from rdflib import Graph, Literal, Namespace, RDF, XSD
 from .utils import parse_date
 
-from .forms import addTriple , RegisterForm
+from .forms import addTriple , RegisterForm, UploadFileForm
 
 def sign_in(request):
     if request.method == "POST":
@@ -53,8 +54,8 @@ sheet = workbook.active
 
 @login_required(login_url="/sign-in")
 def homepage(request):
-    for row in sheet.iter_rows(values_only=True):
-        print(row)
+    # for row in sheet.iter_rows(values_only=True):
+    #     print(row)
 
     items = []
     row_count = 1
@@ -136,7 +137,7 @@ def rdffile_export(request):
             if parse_date(obj) is not None:
                 graph.add((ex_person[name], ex_person[predicate], Literal(obj, datatype=XSD.date)))
             else:
-                graph.add((ex_person[name], ex_person[predicate], Literal(obj)))
+                graph.add((ex_person[name], ex_person[predicate], Literal(obj, datatype=XSD.string)))
 
     graph_file_path = os.path.join(os.path.dirname(__file__), 'rdffile', 'rdf_graph_file.ttl')
     graph.serialize(destination=graph_file_path, format='turtle')
@@ -146,3 +147,48 @@ def rdffile_export(request):
 
     return response
 #rdflib simple example ผมสนใจ Monalisa พระพุทธรูปกับฟัน!!!!!!!!!! ระบบตรวจจับรอยโรคในฟันนนนน, ระบบวิเคราะห์ฉากทัศน์องค์ประกอบพระพุทธรูป กะเพราะปลา
+
+#ต้องมีหน้า import โดยเฉพาะ ตัดง่ายๆไปเลย
+
+def import_xlsx(request):
+    excel_folder_path = os.path.join(os.path.dirname(__file__), 'sheet')
+    sheet_files = os.listdir(excel_folder_path)
+    data = [[i+1, file] for i, file in enumerate(sheet_files)]
+    print(data)
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Process uploaded file ต้องแก้
+            uploaded_file = request.FILES['excel_file']
+            if uploaded_file.name.endswith('.xlsx'):
+            # Save the uploaded file to the 'sheet' folder
+                sheet_folder = os.path.join(os.path.dirname(__file__), 'sheet')
+                file_path = os.path.join(sheet_folder, uploaded_file.name)
+                with open(file_path, 'wb') as destination:
+                    for chunk in uploaded_file.chunks():
+                        destination.write(chunk)
+                return redirect('import_xlsx')
+            else:
+                # If the file is not in .xlsx format, return an error
+                return render(request, 'import.html', {'form': form, 'sheet_files': data, 'error_message': 'Please upload an Excel file (.xlsx)'})
+    else:
+        form = UploadFileForm()
+    return render(request, 'import.html', {'form': form, 'sheet_files': data})
+
+def xlsx_del(request, file_number):
+    # Delete the file
+    print(file_number)
+    excel_folder_path = os.path.join(os.path.dirname(__file__), 'sheet')
+    sheet_files = os.listdir(excel_folder_path)
+    file_path = os.path.join(excel_folder_path, sheet_files[file_number-1])
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        
+        # Update the list of sheet files after deletion
+        sheet_files.remove(sheet_files[file_number-1])
+        
+        # You can return a JsonResponse to indicate success
+        return redirect('import_xlsx')
+    else:
+        # Return a JsonResponse to indicate failure
+        return JsonResponse({'success': False})

@@ -14,3 +14,6 @@ class RegisterForm(UserCreationForm):
         "password1",
         "password2",
     ]
+
+class UploadFileForm(forms.Form):
+    excel_file = forms.FileField()

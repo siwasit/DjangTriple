@@ -5,17 +5,17 @@
 ns1:himler a ns1:Person ;
     ns1:born "1900-10-07"^^xsd:date ;
     ns1:die "1945-05-23"^^xsd:date ;
-    ns1:is_a "commander",
-        "officer" ;
+    ns1:is_a "commander"^^xsd:string,
+        "officer"^^xsd:string ;
     foaf:knows ns1:peiper .
 
 ns1:peiper a ns1:Person ;
     ns1:born "1915-01-30"^^xsd:date ;
-    ns1:born_in "Wilmersdorf, Berlin, Germany" ;
+    ns1:born_in "Wilmersdorf, Berlin, Germany"^^xsd:string ;
     ns1:die "1976-07-14"^^xsd:date ;
-    ns1:is_a "German",
-        "commander",
-        "nazi member",
-        "officer",
-        "soldier" .
+    ns1:is_a "German"^^xsd:string,
+        "commander"^^xsd:string,
+        "nazi member"^^xsd:string,
+        "officer"^^xsd:string,
+        "soldier"^^xsd:string .
 

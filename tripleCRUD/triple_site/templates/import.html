@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function delete_xlsx_file(file_num) {
+            // Perform an AJAX request to delete the item
+            const csrftoken = getCookie('csrftoken');
+
+            fetch('/delete_xlsx/' + file_num, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({}),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Item successfully deleted, you can redirect or update the UI as needed
+                        // window.location.reload();  // Reload the page for demonstration
+                        window.location.reload();
+                    } else {
+                        // Handle errors
+                        console.error('Failed to delete item');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Excel Files in 'sheet' Folder:</h2>
+        <div style="height: 30rem; overflow-y: auto;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">N0.</th>
+                        <th scope="col">File Name</th>
+                        <th scope="col" class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in sheet_files %}
+                    <tr scope="row">
+                        <td>{{ file.0 }}</td>
+                        <td>{{ file.1 }}</td>
+                        <td class="d-flex justify-content-end gap-2">
+                            <a href="" class="btn btn-primary">Equip</a>
+                            <a href="{% url 'xlsx_del' file.0 %}" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <h3>Import your Excel file</h3>
+        <form method="post" class="d-flex" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="col-8">
+                <div class="form-group">
+                    {{ form }}
+                </div>
+            </div>
+            <div class="col-4 d-flex justify-content-end">
+                <button type="submit" class="btn btn-success">Add your file</button>
+            </div>
+        </form>
+
+        {% if error_message %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ error_message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+
+</html>
