@@ -1,16 +1,19 @@
 import os
 from openpyxl import load_workbook
 from django.shortcuts import redirect, render
-from django.http import FileResponse, JsonResponse
+from django.http import FileResponse, JsonResponse, HttpResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
+import rdflib
 from rdflib import Graph, Literal, Namespace, RDF, XSD
 import rdflib
+from io import BytesIO
 import plotly.graph_objs as go
 import networkx as nx
-from .utils import parse_date
+
+from .utils import parse_date, graph_construct
 
 from .models import ExcelFile
 from .forms import addTriple , RegisterForm, UploadFileForm
@@ -51,12 +54,6 @@ def sign_out(request):
     # Redirect to sign-in page
     return redirect('/sign-in')
 
-# excel_file_path = os.path.join(os.path.dirname(__file__), 'sheet', 'triple_sheet.xlsx')
-# excel_file = ExcelFile.objects.all()[0]
-# excel_file_path = excel_file.file.path
-# workbook = load_workbook(excel_file_path)
-# sheet = workbook.active
-
 @login_required(login_url="/sign-in")
 def homepage(request, file_number=1):
     # for row in sheet.iter_rows(values_only=True):
@@ -68,6 +65,7 @@ def homepage(request, file_number=1):
     
     # Load the Excel workbook
     workbook = load_workbook(excel_file.file.path)
+    print(excel_file.file.path)
     
     # Get the active sheet
     sheet = workbook.active
@@ -135,47 +133,11 @@ def triple_edit(request, triple_id, sheet_num):
     
 # @login_required(login_url="/sign-in")
 def rdffile_export(request, sheet_num):
-    print(sheet_num)
 
-    excel_file = ExcelFile.objects.all()[sheet_num]
-    excel_file_path = excel_file.file.path
-    workbook = load_workbook(excel_file_path)
-    sheet = workbook.active
+    rdf_data = graph_construct(sheet_num)[0]
+    print(rdf_data, 'hi')
 
-    graph = Graph()
-    ex_person = Namespace("http://example.org/person#")
-    foaf = Namespace("http://xmlns.com/foaf/0.1/")
-
-    for i, row in enumerate(sheet.iter_rows(values_only=True), start=1):
-        if i==1:
-            continue
-
-        name, class_type = row[0].split(':')
-        predicate, obj = row[1], row[2]
-        person_to_check = (ex_person[name], RDF.type, ex_person[class_type])
-
-        triple_exists = False
-        for triple in graph.triples((ex_person[name], RDF.type, None)):
-            if triple == person_to_check:
-                triple_exists = True
-                break
-
-        if not triple_exists:
-            # If the triple does not exist, add it to the graph
-            graph.add(person_to_check)
-
-        if (ex_person[obj], RDF.type, None) in graph:
-            graph.add((ex_person[name], foaf[predicate], ex_person[obj]))
-        else:
-            if parse_date(obj) is not None:
-                graph.add((ex_person[name], ex_person[predicate], Literal(obj, datatype=XSD.date)))
-            else:
-                graph.add((ex_person[name], ex_person[predicate], Literal(obj, datatype=XSD.string)))
-
-    graph_file_path = os.path.join(os.path.dirname(__file__), 'rdffile', 'rdf_graph_file.ttl')
-    graph.serialize(destination=graph_file_path, format='turtle')
-
-    response = FileResponse(open(graph_file_path, 'rb'))
+    response = HttpResponse(rdf_data, content_type='text/turtle')
     response['Content-Disposition'] = 'attachment; filename="rdf_graph_file.ttl"'
 
     return response
@@ -209,6 +171,7 @@ def xlsx_del(request, file_number):
         excel_file = ExcelFile.objects.get(pk=file_number)
         
         # Delete the ExcelFile object from the database
+        os.remove(excel_file.file.path)
         excel_file.delete()
         
         # Return a redirect response to the import_xlsx view
@@ -224,11 +187,9 @@ def excel_equip(request, file_number):
     file_number = int(file_number)
     return redirect(reverse('homepage', kwargs={'file_number': file_number}))
     
-def visualization(request):
+def visualization(request, sheet_num):
     # Load RDF graph from file
-    graph_file_path = os.path.join(os.path.dirname(__file__), 'rdffile', 'rdf_graph_file.ttl')
-    g = rdflib.Graph()
-    g.parse(graph_file_path, format='turtle')
+    g = graph_construct(sheet_num)[1]
 
     # Create nodes and edges for the network graph
     nx_graph = nx.Graph()
@@ -272,4 +233,4 @@ def visualization(request):
 
     plot_div = fig.to_html(full_html=False, include_plotlyjs=False)
 
-    return render(request, 'visualization.html', {'plot_div': plot_div})
+    return render(request, 'visualization.html', {'plot_div': plot_div, 'sheet_num': sheet_num})
