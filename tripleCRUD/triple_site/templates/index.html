@@ -31,7 +31,14 @@
                     break;
                 }
             }
-            document.getElementById('exportBtn').disabled = !allApproved;
+            var exportBtn = document.getElementById('exportBtn');
+            if (allApproved) {
+                exportBtn.classList.remove('disabled');
+                exportBtn.style.pointerEvents = 'auto';
+            } else {
+                exportBtn.classList.add('disabled');
+                exportBtn.style.pointerEvents = 'none';
+            }
         }
 
         function updateButtonColor(itemId) {
@@ -49,7 +56,15 @@
 
 <body>
     <div class="container">
-        <h2>Triple Table Dashboard</h2>
+        <div class="row pt-2 align-items-center">
+            <div class="col-md-9">
+                <h2>Triple Table Dashboard</h2>
+            </div>
+            <div class="col-md-3 text-md-right">
+                <a class="btn btn-success" href="{% url 'visualization' %}">Visualization</a>
+            </div>
+        </div>
+        <h5>sheet name: {{ sheet_name }}</h5>
         <div style="height: 30rem; overflow-y: auto;">
             <table class="table">
                 <thead>
@@ -68,15 +83,15 @@
                         <td>{{ item.0 }}</td>
                         <td class="">
                             <button class="btn btn-primary btn-margin"
-                                onclick="showEditForm('{{ item.0 }}', '{{ item.1 }}', '{{ item.2 }}', '{{ item.3 }}')">Edit</button>
-                            <button class="btn btn-danger btn-margin"
-                                onclick="delete_triple('{{ item.0 }}')">Delete</button>
+                                onclick="showEditForm('{{ item.0 }}', '{{ item.1 }}', '{{ item.2 }}', '{{ item.3 }}', '{{ sheet_num }}')">Edit</button>
+                            <a class="btn btn-danger" href="{% url 'triple_delete' item.0 sheet_num %}">Delete</a>
                         </td>
                         <td>{{ item.1 }}</td>
                         <td>{{ item.2 }}</td>
                         <td>{{ item.3 }}</td>
                         <td>
-                            <button id="approvalBtn{{ item.0 }}" class="btn btn-warning btn-margin" onclick="toggleApproval('{{ item.0 }}')">
+                            <button id="approvalBtn{{ item.0 }}" class="btn btn-warning btn-margin"
+                                onclick="toggleApproval('{{ item.0 }}')">
                                 Approve
                             </button>
                         </td>
@@ -138,7 +153,9 @@
         </form>
 
         <button class="btn btn-primary" onclick="logout()">Logout</button>
-        <button id="exportBtn" class="btn btn-primary" onclick="export_graph()" disabled>Export</button>
+        <!-- <button id="exportBtn" class="btn btn-primary" onclick="export_graph('{{ sheet_num }}')" disabled>Export</button> -->
+        <a id="exportBtn" class="btn btn-primary disabled" style="pointer-events: none" href="{% url 'rdffile_export' sheet_num %}">Export</a>
+
         <a class="btn btn-success" href="{% url 'import_xlsx' %}">Import</a>
     </div>
 </body>

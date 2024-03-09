@@ -65,49 +65,7 @@ function logout() {
         });
 }
 
-function export_graph() {
-    // Perform an AJAX request to export the RDF graph file
-    const csrftoken = getCookie('csrftoken');
-
-    fetch('/export/', {
-        method: 'GET',
-        headers: {
-            'X-CSRFToken': csrftoken
-        }
-    })
-        .then(response => {
-            if (response.ok) {
-                // If the response is successful, trigger the file download
-                return response.blob();
-            } else {
-                // Handle errors
-                console.error('Failed to export RDF graph file');
-                throw new Error('Failed to export RDF graph file');
-            }
-        })
-        .then(blob => {
-            // Create a temporary URL for the blob
-            const url = window.URL.createObjectURL(blob);
-
-            // Create a link element to trigger the download
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'rdf_graph_file.ttl';  // Set the filename for the download
-            document.body.appendChild(link);
-
-            // Trigger the download
-            link.click();
-
-            // Clean up
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(link);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}
-
-function showEditForm(id, subject, predicate, object) {
+function showEditForm(id, subject, predicate, object, sheet_num) {
     document.getElementById('editTripleId').value = id;
     document.getElementById('editSubject').value = subject;
     document.getElementById('editPredicate').value = predicate;
@@ -115,39 +73,9 @@ function showEditForm(id, subject, predicate, object) {
     document.getElementById('editFormContainer').style.display = 'block';
 
     var form = document.getElementById('editForm');
-    form.action = '/edit-triple/' + id;
+    form.action = '/edit-triple/' + id +'/' + sheet_num;
 }
 
 function cancelEdit() {
     document.getElementById('editFormContainer').style.display = 'none';
 }
-
-// function toggleApproval(itemId) {
-//     approvalStatus[itemId] = !approvalStatus[itemId];
-//     updateButtonColor(itemId);
-//     checkAllApproved();
-// }
-
-// function checkAllApproved() {
-//     var allApproved = true;
-//     for (var key in approvalStatus) {
-//         if (!approvalStatus[key]) {
-//             allApproved = false;
-//             break;
-//         }
-//     }
-//     document.getElementById('exportBtn').disabled = !allApproved;
-// }
-
-// function updateButtonColor(itemId) {
-//     var button = document.getElementById('approvalBtn' + itemId);
-//     if (approvalStatus[itemId]) {
-//         button.classList.remove('btn-warning');
-//         button.classList.add('btn-success');
-//     } else {
-//         button.classList.remove('btn-success');
-//         button.classList.add('btn-warning');
-//     }
-// }
-
-// var approvalStatus = {};
