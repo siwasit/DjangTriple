@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDF visualization</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row pt-2 align-items-center">
+            <div class="col-md-9">
+                <h2>RDF Visualization</h2>
+            </div>
+            <div class="col-md-3 text-md-right">
+                <a href="{% url 'homepage' %}" class="btn btn-secondary">Homepage</a>
+            </div>
+        </div>
+        <div id="plot"></div>
+        <!-- Render Plotly visualization -->
+        {{ plot_div | safe }}
+    </div>
+    
+</body>
+</html>
